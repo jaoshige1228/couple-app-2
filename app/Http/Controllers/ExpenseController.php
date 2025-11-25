@@ -84,10 +84,7 @@ class ExpenseController extends Controller
     {
         $expense = Expense::with('user')->findOrFail($id);
         
-        // 自分の支出のみアクセス可能
-        if ($expense->user_id !== auth()->id()) {
-            return response()->json(['error' => '権限がありません。'], 403);
-        }
+        // 閲覧権限は誰でも可能（削除）
 
         return response()->json($expense);
     }
@@ -145,6 +142,94 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return response()->json(['message' => '支出を削除しました。']);
+    }
+
+    /**
+     * 月ごとの項目別支出集計を取得（家計簿用）
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function householdBook(Request $request)
+    {
+        $request->validate([
+            'year' => 'required|integer|min:2000|max:2100',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        // 項目別に集計
+        $summary = Expense::select('item', DB::raw('SUM(amount) as total'))
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->groupBy('item')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // 合計金額を計算
+        $totalAmount = Expense::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->sum('amount');
+
+        return response()->json([
+            'summary' => $summary,
+            'total' => $totalAmount,
+            'year' => $year,
+            'month' => $month,
+        ]);
+    }
+
+    /**
+     * 履歴一覧を取得（登録と編集の履歴）
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function history(Request $request)
+    {
+        $request->validate([
+            'year' => 'nullable|integer|min:2000|max:2100',
+            'month' => 'nullable|integer|min:1|max:12',
+        ]);
+
+        $query = Expense::with('user')
+            ->orderBy('updated_at', 'desc');
+
+        // 年月でフィルタリング（指定がある場合）
+        if ($request->has('year') && $request->has('month')) {
+            $year = $request->input('year');
+            $month = $request->input('month');
+            $query->whereYear('date', $year)
+                  ->whereMonth('date', $month);
+        }
+
+        $expenses = $query->get();
+
+        // アクションタイプを判定（登録か編集か）
+        $history = $expenses->map(function ($expense) {
+            // created_atとupdated_atが同じ（または1秒以内の差）なら「登録」、それ以外は「編集」
+            $createdTimestamp = $expense->created_at->timestamp;
+            $updatedTimestamp = $expense->updated_at->timestamp;
+            $actionType = abs($createdTimestamp - $updatedTimestamp) <= 1 ? '登録' : '編集';
+            
+            return [
+                'id' => $expense->id,
+                'date' => $expense->date,
+                'item' => $expense->item,
+                'amount' => $expense->amount,
+                'user' => $expense->user,
+                'user_id' => $expense->user_id,
+                'is_full_settlement' => $expense->is_full_settlement,
+                'memo' => $expense->memo,
+                'action_type' => $actionType,
+                'created_at' => $expense->created_at,
+                'updated_at' => $expense->updated_at,
+            ];
+        });
+
+        return response()->json($history);
     }
 }
 

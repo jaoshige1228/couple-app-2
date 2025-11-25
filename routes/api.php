@@ -31,6 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // 支出関連
     Route::get('/expenses', [ExpenseController::class, 'index']); // 月ごとの支出一覧
     Route::get('/expenses/count', [ExpenseController::class, 'count']); // 支出の総数
+    Route::get('/expenses/household-book', [ExpenseController::class, 'householdBook']); // 家計簿（項目別集計）
+    Route::get('/expenses/history', [ExpenseController::class, 'history']); // 履歴一覧（登録・編集）
     Route::post('/expenses', [ExpenseController::class, 'store']); // 支出の登録
     Route::get('/expenses/{id}', [ExpenseController::class, 'show']); // 支出の詳細取得
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']); // 支出の更新

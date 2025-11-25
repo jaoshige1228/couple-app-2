@@ -23,14 +23,24 @@
                     <label for="item" class="block text-sm font-medium text-gray-700 mb-2">
                         項目
                     </label>
-                    <input
+                    <select
                         id="item"
                         v-model="form.item"
-                        type="text"
                         required
-                        placeholder="例: 食費、光熱費、医療費"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+                    >
+                        <option value="">選択してください</option>
+                        <option value="食費">食費</option>
+                        <option value="光熱費">光熱費</option>
+                        <option value="医療費">医療費</option>
+                        <option value="交通費">交通費</option>
+                        <option value="日用品">日用品</option>
+                        <option value="外食">外食</option>
+                        <option value="娯楽">娯楽</option>
+                        <option value="衣服">衣服</option>
+                        <option value="雑費">雑費</option>
+                        <option value="その他">その他</option>
+                    </select>
                 </div>
 
                 <div>
@@ -209,9 +219,15 @@ const handleSubmit = async () => {
             successMessage.value = '支出を登録しました。';
         }
         
-        // 成功後、支出一覧ページにリダイレクト
+        // 成功後、登録した年月の支出一覧ページにリダイレクト
         setTimeout(() => {
-            router.push('/expenses');
+            const expenseDate = new Date(form.value.date);
+            const year = expenseDate.getFullYear();
+            const month = expenseDate.getMonth() + 1;
+            router.push({
+                path: '/expenses',
+                query: { year, month }
+            });
         }, 1000);
     } catch (error) {
         console.error('Submit error:', error);
@@ -233,9 +249,13 @@ const handleDelete = async () => {
         await deleteExpense(route.params.id);
         successMessage.value = '支出を削除しました。';
         
-        // 成功後、支出一覧ページにリダイレクト
+        // 成功後、支出一覧ページにリダイレクト（年月パラメータを保持）
         setTimeout(() => {
-            router.push('/expenses');
+            const query = route.query;
+            router.push({
+                path: '/expenses',
+                query: query.year && query.month ? { year: query.year, month: query.month } : {}
+            });
         }, 1000);
     } catch (error) {
         errorMessage.value = '支出の削除に失敗しました。';

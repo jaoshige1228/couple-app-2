@@ -4,6 +4,9 @@ import Login from './components/Login.vue';
 import Layout from './components/Layout.vue';
 import ExpenseList from './components/ExpenseList.vue';
 import ExpenseForm from './components/ExpenseForm.vue';
+import ExpenseDetail from './components/ExpenseDetail.vue';
+import ExpenseHistory from './components/ExpenseHistory.vue';
+import HouseholdBook from './components/HouseholdBook.vue';
 
 console.log('Router.js loaded, components imported');
 
@@ -31,9 +34,24 @@ const routes = [
                 component: ExpenseForm,
             },
             {
+                path: 'expenses/history',
+                name: 'ExpenseHistory',
+                component: ExpenseHistory,
+            },
+            {
                 path: 'expenses/:id/edit',
                 name: 'ExpenseEdit',
                 component: ExpenseForm,
+            },
+            {
+                path: 'expenses/:id',
+                name: 'ExpenseDetail',
+                component: ExpenseDetail,
+            },
+            {
+                path: 'household-book',
+                name: 'HouseholdBook',
+                component: HouseholdBook,
             },
         ]
     },

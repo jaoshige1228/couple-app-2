@@ -1,13 +1,13 @@
 <template>
-    <div class="max-w-6xl mx-auto p-6">
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">月ごとの支出一覧</h2>
-                <div class="flex space-x-4">
+    <div class="max-w-6xl mx-auto p-2 sm:p-6">
+        <div class="bg-white shadow-md rounded-lg p-3 sm:p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+                <h2 class="text-lg sm:text-2xl font-bold text-gray-800 whitespace-nowrap">月ごとの支出一覧</h2>
+                <div class="flex flex-wrap gap-2 sm:space-x-4">
                     <select
                         v-model="selectedYear"
                         @change="loadData"
-                        class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                         <option v-for="year in years" :key="year" :value="year">
                             {{ year }}年
@@ -16,7 +16,7 @@
                     <select
                         v-model="selectedMonth"
                         @change="loadData"
-                        class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                         <option v-for="month in 12" :key="month" :value="month">
                             {{ month }}月
@@ -25,7 +25,7 @@
                     <select
                         v-model="filterUser"
                         @change="applyFilter"
-                        class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                         <option value="">すべて</option>
                         <option value="太郎">太郎</option>
@@ -47,56 +47,61 @@
                     この月の支出はありません。
                 </div>
 
-                <div v-else class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div v-else class="overflow-x-auto -mx-3 sm:mx-0">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     日付
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     項目
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     金額
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     払った人
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                     全額精算
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                     メモ
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     操作
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="expense in filteredExpenses" :key="expense.id">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <tr 
+                                v-for="expense in filteredExpenses" 
+                                :key="expense.id"
+                                @click="viewDetail(expense.id)"
+                                class="cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                     {{ formatDate(expense.date) }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                     {{ expense.item }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-900 font-medium">
                                     {{ formatCurrency(expense.amount) }}円
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                     {{ expense.user?.name }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span v-if="expense.is_full_settlement" class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                        全額精算
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs hidden md:table-cell">
+                                    <span v-if="expense.is_full_settlement" class="px-1.5 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                        全額
                                     </span>
-                                    <span v-else class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    <span v-else class="px-1.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                         割り勘
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-900">
+                                <td class="px-2 sm:px-4 py-2 text-xs sm:text-sm text-gray-900 hidden lg:table-cell">
                                     <div v-if="expense.memo" class="max-w-xs">
                                         <button
                                             @click="toggleMemo(expense.id)"
@@ -112,14 +117,15 @@
                                     </div>
                                     <span v-else class="text-gray-400">-</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <td class="px-2 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
                                     <button
                                         v-if="expense.user_id === currentUserId"
-                                        @click="editExpense(expense.id)"
-                                        class="text-indigo-600 hover:text-indigo-900"
+                                        @click.stop="editExpense(expense.id)"
+                                        class="text-indigo-600 hover:text-indigo-900 font-medium"
                                     >
                                         編集
                                     </button>
+                                    <span v-else class="text-gray-400 text-xs">タップで詳細</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -170,19 +176,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onActivated, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onActivated, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 import { useExpenses } from '../composables/useExpenses';
 import { useSettlement } from '../composables/useSettlement';
 
 const router = useRouter();
+const route = useRoute();
 const { user } = useAuth();
 const { expenses, loading, error, fetchExpenses } = useExpenses();
 const { settlement, calculateSettlement } = useSettlement();
 
-const selectedYear = ref(new Date().getFullYear());
-const selectedMonth = ref(new Date().getMonth() + 1);
+// URLパラメータから年月を取得（なければ現在の年月）
+const urlYear = route.query.year ? parseInt(route.query.year) : null;
+const urlMonth = route.query.month ? parseInt(route.query.month) : null;
+
+const selectedYear = ref(urlYear || new Date().getFullYear());
+const selectedMonth = ref(urlMonth || new Date().getMonth() + 1);
 const filterUser = ref('');
 const expandedMemos = ref({});
 
@@ -213,6 +224,15 @@ const years = computed(() => {
 
 const loadData = async () => {
     try {
+        // URLパラメータを更新
+        router.replace({
+            query: {
+                ...route.query,
+                year: selectedYear.value,
+                month: selectedMonth.value,
+            }
+        });
+        
         await fetchExpenses(selectedYear.value, selectedMonth.value);
         
         // 前月までの場合のみ精算計算を実行
@@ -231,8 +251,26 @@ const applyFilter = () => {
     // フィルターはcomputedで自動的に適用される
 };
 
+const viewDetail = (id) => {
+    // 詳細画面に遷移（年月パラメータを保持）
+    router.push({
+        path: `/expenses/${id}`,
+        query: {
+            year: selectedYear.value,
+            month: selectedMonth.value,
+        }
+    });
+};
+
 const editExpense = (id) => {
-    router.push(`/expenses/${id}/edit`);
+    // 編集画面に遷移（年月パラメータを保持）
+    router.push({
+        path: `/expenses/${id}/edit`,
+        query: {
+            year: selectedYear.value,
+            month: selectedMonth.value,
+        }
+    });
 };
 
 const toggleMemo = (id) => {
@@ -254,12 +292,34 @@ const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP').format(amount);
 };
 
+// URLパラメータの変更を監視
+watch(() => route.query, (newQuery) => {
+    if (newQuery.year && newQuery.month) {
+        const year = parseInt(newQuery.year);
+        const month = parseInt(newQuery.month);
+        if (year !== selectedYear.value || month !== selectedMonth.value) {
+            selectedYear.value = year;
+            selectedMonth.value = month;
+            loadData();
+        }
+    }
+}, { immediate: false });
+
 onMounted(() => {
     loadData();
 });
 
 // ページが表示されるたびにデータを再読み込み（支出登録後のリダイレクトに対応）
 onActivated(() => {
+    // URLパラメータから年月を取得して更新
+    if (route.query.year && route.query.month) {
+        const year = parseInt(route.query.year);
+        const month = parseInt(route.query.month);
+        if (year !== selectedYear.value || month !== selectedMonth.value) {
+            selectedYear.value = year;
+            selectedMonth.value = month;
+        }
+    }
     loadData();
 });
 </script>
